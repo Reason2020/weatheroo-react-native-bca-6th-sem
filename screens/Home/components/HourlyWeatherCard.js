@@ -1,21 +1,44 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { convertUnixTimeToReadableTime } from '../../../utils/convertUnixTimeToReadableTime'
+import { app } from '../../../firebaseConfig'
+import { getStorage, ref, getDownloadURL } from 'firebase/storage'
 
 const HourlyWeatherCard = ({ weatherItem }) => {
+  const [ imageUrl, setImageUrl ] = useState("");
+
   const hours = (convertUnixTimeToReadableTime(weatherItem?.dt).getHours());
   const minutes = (convertUnixTimeToReadableTime(weatherItem?.dt)).getMinutes();
+
+  const storage = getStorage(app);
+
+  useEffect(() => {
+    if (weatherItem?.weather[0]) {
+      const icon = weatherItem?.weather[0].icon;
+      const imageRef = ref(storage, `${icon}.png`);
+
+      getDownloadURL(imageRef)
+        .then((url) => {
+          setImageUrl(url);
+        })
+        .catch((error) => {
+          console.log("Error while fetching data...", error);
+        });
+    }
+  }, [weatherItem])
 
   return (
     <View style={styles.container}>
       <View style={styles.weatherCard}>
-        <Image
-            source={require('../../../assets/weather.png')}
+        {imageUrl && (
+          <Image
+            source={{ uri: imageUrl }}
             style={styles.weatherIcon}
-        />
+          />
+        )}
         <Text style={styles.temperatureText}>{Math.round(weatherItem.main.temp)}°C</Text>
       </View>
-      <Text style={styles.timeText}>{((hours + 1) % 12) === 0 ? "12" : (hours + 1) % 12} {hours > 12 ? "PM" : "AM"}</Text>
+      <Text style={styles.timeText}>{hours % 12}:{minutes} {hours > 12 ? "PM" : "AM"}</Text>
     </View>
   )
 }
