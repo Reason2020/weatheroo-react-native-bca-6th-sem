@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
 
-const MainWeather = () => {
+const MainWeather = ({ weatherData }) => {
     const [ currentDateAndTime, setCurrentDateAndTime ] = useState(new Date());
 
     useEffect(() => {
@@ -24,8 +24,8 @@ const MainWeather = () => {
                 style={styles.weatherIcon}
             />
             <View style={styles.weatherDetails}>
-                <Text style={styles.temperatureText}>21°</Text>
-                <Text style={styles.weatherDescriptionText}>Cloudy</Text>
+                <Text style={styles.temperatureText}>{Math.round(weatherData?.main?.temp)}°</Text>
+                <Text style={styles.weatherDescriptionText}>{weatherData?.weather[0]?.main}</Text>
             </View>
         </View>
         <Text style={styles.dateAndTimeText}>{weeksOfDay[currentDateAndTime.getDay()].slice(0, 3)}, {currentDateAndTime.getDate()} {monthsOfYear[currentDateAndTime.getMonth()].slice(0, 3)} | {currentDateAndTime.getHours()} : {currentDateAndTime.getMinutes() > 9 ? currentDateAndTime.getMinutes() : `0${currentDateAndTime.getMinutes()}`} {currentDateAndTime.getHours > 12 ? "PM" : "AM"}</Text>

@@ -1,7 +1,11 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
+import { convertUnixTimeToReadableTime } from '../../../utils/convertUnixTimeToReadableTime'
 
 const HourlyWeatherCard = ({ weatherItem }) => {
+  const hours = (convertUnixTimeToReadableTime(weatherItem?.dt).getHours());
+  const minutes = (convertUnixTimeToReadableTime(weatherItem?.dt)).getMinutes();
+
   return (
     <View style={styles.container}>
       <View style={styles.weatherCard}>
@@ -9,9 +13,9 @@ const HourlyWeatherCard = ({ weatherItem }) => {
             source={require('../../../assets/weather.png')}
             style={styles.weatherIcon}
         />
-        <Text style={styles.temperatureText}>{weatherItem.temperature}°C</Text>
+        <Text style={styles.temperatureText}>{weatherItem.main.temp}°C</Text>
       </View>
-      <Text style={styles.timeText}>{weatherItem.time}:00 PM</Text>
+      <Text style={styles.timeText}>{hours % 12}:{minutes} {hours > 12 ? "PM" : "AM"}</Text>
     </View>
   )
 }

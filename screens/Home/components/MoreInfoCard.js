@@ -4,7 +4,27 @@ import Iconify from '../../../components/Iconify';
 
 const screenWidth = Dimensions.get('screen').height;
 
-const MoreInfoCard = ({ title, iconsFrom, iconName, color, value, unit }) => {
+const MoreInfoCard = ({ title, iconsFrom, iconName, color, unit, weatherData }) => {
+    let value = "";
+    if (title === "Wind") {
+        value = Math.round(weatherData?.wind?.speed);
+    } else if (title === "Humidity") {
+        value = weatherData?.main?.humidity;
+    } else if (title === "Pressure") {
+        value = weatherData?.main?.pressure;
+    } else if (title === "Visibility") {
+        value = Math.round((weatherData?.visibility) / 1000);
+    } else if (title === "Sunrise") {
+        const unixTimeStamp = weatherData?.sys?.sunrise;
+        const date = new Date(unixTimeStamp * 1000);
+        const sunriseTime = `${(date.getHours() % 12).toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+        value = sunriseTime;
+    } else if (title === "Sunset") {
+        const unixTimeStamp = weatherData?.sys?.sunset;
+        const date = new Date(unixTimeStamp * 1000);
+        const sunsetTIme = `${(date.getHours() % 12).toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+        value = sunsetTIme;
+    }
   return (
     <View style={styles.container}>
       <Iconify iconsFrom={iconsFrom} iconName={iconName} color={color} />
@@ -36,5 +56,8 @@ const styles = StyleSheet.create({
     valueText: {
         color: '#fff',
         fontSize: 18
+    },
+    moreInfoDesc: {
+        alignItems: 'flex-end'
     }
 })

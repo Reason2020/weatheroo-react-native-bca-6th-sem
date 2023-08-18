@@ -1,9 +1,27 @@
 import { StyleSheet, Text, View, FlatList, TouchableOpacity } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Ionicons } from '@expo/vector-icons';
 import HourlyWeatherCard from './HourlyWeatherCard'
 
-const HourlyWeatherInfo = ({ navigation }) => {
+const HourlyWeatherInfo = ({ navigation, weatherData }) => {
+    const [ currentTime, setCurrentTime ] = useState(Math.floor(Date.now() / 1000));
+    const [ filteredWeatherData, setFilteredWeatherData ] = useState(null);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const timeNow = Date.now();
+            const unixTimeNow = Math.floor(timeNow / 1000);
+            setCurrentTime(unixTimeNow);
+        }, 60000);
+
+        return () => clearInterval(timer);
+    }, []);
+
+    useEffect(() => {
+        const newWeatherData = weatherData?.filter(item => item?.dt >= currentTime);
+        setFilteredWeatherData(newWeatherData);
+    }, [currentTime])
+
     const hourlyWeatherInfo = [
         { id: 1, temperature: 24, time: 1 },
         { id: 2, temperature: 21, time: 2 },
@@ -27,7 +45,7 @@ const HourlyWeatherInfo = ({ navigation }) => {
             </TouchableOpacity>
         </View>
       <FlatList 
-        data={hourlyWeatherInfo}
+        data={filteredWeatherData}
         renderItem={({item}) => <HourlyWeatherCard weatherItem={item} />}
         keyExtractor={item => item.id}
         horizontal

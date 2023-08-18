@@ -2,14 +2,14 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import MoreInfoCard from './MoreInfoCard'
 
-const MoreInformation = () => {
+const MoreInformation = ({ weatherData }) => {
     const moreInformationTitleRequirements = [
         {title: 'Wind', iconsFrom: 'Feather', iconName: 'wind', color: '#A0C8F4', value: '4', unit: 'km/h'},
         {title: 'Humidity', iconsFrom: 'Ionicons', iconName: 'water', color: '#A0C8F4', value: '56', unit: '%'},
-        {title: 'Precipitation', iconsFrom: 'Entypo', iconName: 'water', color: '#A0C8F4', value: '20', unit: 'mm'},
         {title: 'Pressure', iconsFrom: 'FontAwesome', iconName: 'thermometer-2', color: '#F35E4D', value: '800', unit: 'hcpa'},
-        {title: 'Air Quality', iconsFrom: 'Entypo', iconName: 'air', color: '#F8F5FC', value: '34', unit: ''},
-        {title: 'VIsibility', iconsFrom: 'Feather', iconName: 'cloud-off', color: '#F8F5FC', value: '11', unit: 'km'}
+        {title: 'Visibility', iconsFrom: 'Feather', iconName: 'cloud-off', color: '#F8F5FC', value: '11', unit: 'km'},
+        {title: 'Sunrise', iconsFrom: 'Feather', iconName: 'sunrise', color: '#FFC300', value: '20', unit: 'AM'},
+        {title: 'Sunset', iconsFrom: 'Feather', iconName: 'sunset', color: '#FFC300', value: '34', unit: 'PM'}
     ]
 
   return (
@@ -18,7 +18,7 @@ const MoreInformation = () => {
         <Text style={styles.titleText}>More Information</Text>
       </View>
       <View style={styles.cardsContainer}>
-        {moreInformationTitleRequirements.map((information, index) => <MoreInfoCard {...information} key={index} />)}
+        {moreInformationTitleRequirements.map((information, index) => <MoreInfoCard {...information} key={index} weatherData={weatherData} />)}
       </View>
     </View>
   )
