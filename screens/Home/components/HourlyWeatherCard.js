@@ -13,9 +13,9 @@ const HourlyWeatherCard = ({ weatherItem }) => {
             source={require('../../../assets/weather.png')}
             style={styles.weatherIcon}
         />
-        <Text style={styles.temperatureText}>{weatherItem.main.temp}°C</Text>
+        <Text style={styles.temperatureText}>{Math.round(weatherItem.main.temp)}°C</Text>
       </View>
-      <Text style={styles.timeText}>{hours % 12}:{minutes} {hours > 12 ? "PM" : "AM"}</Text>
+      <Text style={styles.timeText}>{((hours + 1) % 12) === 0 ? "12" : (hours + 1) % 12} {hours > 12 ? "PM" : "AM"}</Text>
     </View>
   )
 }

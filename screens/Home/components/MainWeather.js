@@ -1,8 +1,11 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
+import { getStorage, ref, getDownloadURL } from "firebase/storage"; 
+import { app } from '../../../firebaseConfig';
 
 const MainWeather = ({ weatherData }) => {
     const [ currentDateAndTime, setCurrentDateAndTime ] = useState(new Date());
+    const [ imageUrl, setImageUrl ] = useState("");
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -13,16 +16,36 @@ const MainWeather = ({ weatherData }) => {
         return () => clearInterval(timer);
     }, []);
 
+    const storage = getStorage(app);
+    
+
+    useEffect(() => {
+        if (weatherData?.weather[0]) {
+            const icon = weatherData?.weather[0].icon;
+            const iconRef = ref(storage, `${icon}.png`);
+
+            getDownloadURL(iconRef)
+                .then((url) => {
+                    setImageUrl(url);
+                })
+                .catch((error) => {
+                    console.log("Error while fetching image: ", error);
+                });
+        }
+    }, [weatherData])
+
     const weeksOfDay = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const monthsOfYear = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   return (
     <View style={styles.container}>
         <View style={styles.topContainer}>
-            <Image 
-                source={require('../../../assets/weather.png')}
+            {imageUrl ? (
+                <Image 
+                source={{ uri: imageUrl }}
                 style={styles.weatherIcon}
             />
+            ) : null}
             <View style={styles.weatherDetails}>
                 <Text style={styles.temperatureText}>{Math.round(weatherData?.main?.temp)}°</Text>
                 <Text style={styles.weatherDescriptionText}>{weatherData?.weather[0]?.main}</Text>

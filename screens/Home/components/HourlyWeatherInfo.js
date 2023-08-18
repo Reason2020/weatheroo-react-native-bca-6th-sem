@@ -35,24 +35,28 @@ const HourlyWeatherInfo = ({ navigation, weatherData }) => {
         { id: 10, temperature: 23, time: 10 }
     ]
 
-  return (
-    <View style={styles.container}>
-        <View style={styles.titleContainer}>
-            <Text style={styles.titleText}>Hourly Weather</Text>
-            <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('WeeklyForecast')}>
-                <Text style={styles.btnText}>Weekly Weather</Text>
-                <Ionicons name="chevron-forward" size={18} color="black" />
-            </TouchableOpacity>
+  if (filteredWeatherData) {
+    return (
+        <View style={styles.container}>
+            <View style={styles.titleContainer}>
+                <Text style={styles.titleText}>Hourly Weather</Text>
+                <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('WeeklyForecast')}>
+                    <Text style={styles.btnText}>Weekly Weather</Text>
+                    <Ionicons name="chevron-forward" size={18} color="black" />
+                </TouchableOpacity>
+            </View>
+        <FlatList 
+            data={filteredWeatherData && filteredWeatherData.slice(0, 10)}
+            renderItem={({item}) => <HourlyWeatherCard weatherItem={item} />}
+            keyExtractor={item => item.dt}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+        />
         </View>
-      <FlatList 
-        data={filteredWeatherData}
-        renderItem={({item}) => <HourlyWeatherCard weatherItem={item} />}
-        keyExtractor={item => item.id}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      />
-    </View>
-  )
+    )
+  } else {
+    return null;
+  }
 }
 
 export default HourlyWeatherInfo
