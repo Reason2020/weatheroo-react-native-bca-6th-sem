@@ -16,10 +16,11 @@ const Home = ({ navigation }) => {
   const [ longitude, setLongitude ] = useState(null);
   const [ currentWeatherData, setCurrentWeatherData ] = useState(null);
   const [ hourlyForecastData, setHourlyForecastData ] = useState(null);
-  const [ loading, setLoading ] = useState(true);
+  const [ loading, setLoading ] = useState(false);
 
   useEffect(() => {
     (async () => {
+      setLoading(true);
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
@@ -37,18 +38,22 @@ const Home = ({ navigation }) => {
     // getCurrentWeatherData();
     // getHourlyWeatherForecast();
     // setLoading(false);
-    (async () => {
-      try {
-        await Promise.all([
-          getCurrentWeatherData(),
-          getHourlyWeatherForecast()
-        ]);
-        setLoading(false);
-      } catch (error) {
-        console.log("Error fetching data: ", error);
-        setLoading(false);
-      }
-    })();
+    if (latitude && longitude) {
+      (async () => {
+        try {
+          console.log("Loading: ", loading);
+          await Promise.all([
+            getCurrentWeatherData(),
+            getHourlyWeatherForecast()
+          ]);
+          setLoading(false);
+        } catch (error) {
+          console.log("Error fetching data: ", error);
+          setLoading(false);
+        }
+      })();      
+    }
+    
   }, [latitude, longitude])
 
   // let text = ""

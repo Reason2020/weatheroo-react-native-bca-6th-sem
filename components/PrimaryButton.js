@@ -2,15 +2,13 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { colors } from '../constants/colors'
 
-const PrimaryButton = ({ handlePress, title, isValid }) => {
-    console.log("Is valid?", isValid);
-    console.log("Handle press?", handlePress)
+const PrimaryButton = ({ handlePress, title, isValid, buttonColor, titleColor }) => {
   return (
     <TouchableOpacity
-        style={styles.primaryBtn}
+        style={[styles.primaryBtn, { backgroundColor: buttonColor }]}
         onPress={() => isValid && handlePress()}
     >
-        <Text style={styles.titleText}>{title}</Text>
+        <Text style={[styles.titleText, { color: titleColor }]}>{title}</Text>
     </TouchableOpacity>
   )
 }
@@ -19,7 +17,6 @@ export default PrimaryButton
 
 const styles = StyleSheet.create({
     primaryBtn: {
-        backgroundColor: colors.primary,
         padding: 15,
         borderRadius: 10,
         flexDirection: 'row',
@@ -29,6 +26,5 @@ const styles = StyleSheet.create({
     titleText: {
         fontSize: 18,
         fontWeight: 400,
-        color: "#fff"
     }
 })

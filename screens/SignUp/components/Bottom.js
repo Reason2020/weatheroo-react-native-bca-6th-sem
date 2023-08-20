@@ -6,13 +6,13 @@ import { colors } from '../../../constants/colors'
 const Bottom = ({ handleSubmit, isValid, navigation }) => {
   return (
     <View style={styles.container}>
-        <PrimaryButton title="Sign in" isValid={isValid} handlePress={handleSubmit} buttonColor={colors.primary} titleColor="#fff" />
+        <PrimaryButton title="Create account" isValid={isValid} handlePress={handleSubmit} buttonColor="#fff" titleColor={colors.primary} />
         <View style={styles.footerContainer}>
-            <Text style={styles.normalText}>Don't have an account?</Text>
+            <Text style={styles.normalText}>Already have an account?</Text>
             <TouchableOpacity 
-                onPress={() => navigation.navigate('SignUp')}
+                onPress={() => navigation.navigate('SignIn')}
             >
-                <Text style={[styles.navigatorText, styles.normalText]}>Sign up</Text>
+                <Text style={[styles.navigatorText, styles.normalText]}>Sign in</Text>
             </TouchableOpacity>
         </View>
     </View>
@@ -31,9 +31,10 @@ const styles = StyleSheet.create({
     },
     normalText: {
         fontSize: 18,
-        fontWeight: 400
+        // fontWeight: 400,
+        color: '#fff'
     },
     navigatorText: {
-        color: colors.primary
+        fontWeight: 700
     }
 })
