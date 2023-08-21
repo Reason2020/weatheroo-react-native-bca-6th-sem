@@ -7,7 +7,7 @@ import Header from './components/Header'
 import { colors } from '../../constants/colors'
 import Bottom from './components/Bottom'
 import { FIREBASE_AUTH } from '../../firebaseConfig'
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 
 const ValidationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -25,11 +25,8 @@ const ValidationSchema = Yup.object().shape({
 })
 
 const SignUp = ({ navigation }) => {
-  // const [ firstName, setFirstName ] = useState('');
-  // const [ lastName, setLastName ] = useState('');
-  // const [ email, setEmail ] = useState('');
-  // const [ password, setPassword ] = useState('');
   const [ showPassword, setShowPassword ] = useState(true);
+  const [ errorMessage, setErrorMessage ] = useState();
 
   const auth = FIREBASE_AUTH;
 
@@ -51,9 +48,15 @@ const SignUp = ({ navigation }) => {
           onSubmit={(values) => (async () => {
             try {
               const response = await createUserWithEmailAndPassword(auth, values.email, values.password);
+              await updateProfile(response.user, {
+                displayName: `${values.firstName} ${values.lastName}`
+              });
               navigation.navigate('SignIn');
             } catch (error) {
-              console.log("Sign in failed: ", error.message)
+              if (error.message === "Firebase: Error (auth/email-already-in-use).") {
+                setErrorMessage("The email address is already in use!");
+              }
+              console.log("Sign up failed: ", error.message)
             }
           })()}
         >
@@ -70,17 +73,13 @@ const SignUp = ({ navigation }) => {
               <View style={styles.formElementContainer}>
                 <TextInput 
                   value={values.firstName}
-                  // onChangeText={() => {
-                  //   handleChange('firstName')
-                  //   setFirstName(values.firstName)
-                  // }}
                   onChangeText={handleChange('firstName')}
                   onBlur={handleBlur('firstName')}
                   placeholder='First Name'
                   placeholderTextColor='#ccc'
                   style={styles.inputField}
                 />
-                {touched && errors.firstName && (
+                {touched.firstName && errors.firstName && (
                   <Text style={styles.errorText}>*{errors.firstName}</Text>
                 )}
               </View>
@@ -93,7 +92,7 @@ const SignUp = ({ navigation }) => {
                   placeholderTextColor='#ccc'
                   style={styles.inputField}
                 />
-                {touched && errors.lastName && (
+                {touched.lastName && errors.lastName && (
                   <Text style={styles.errorText}>*{errors.lastName}</Text>
                 )}
               </View>
@@ -106,7 +105,7 @@ const SignUp = ({ navigation }) => {
                   placeholderTextColor='#ccc'
                   style={styles.inputField}
                 />
-                {touched && errors.email && (
+                {touched.email && errors.email && (
                   <Text style={styles.errorText}>*{errors.email}</Text>
                 )}
               </View>
@@ -120,7 +119,7 @@ const SignUp = ({ navigation }) => {
                   style={styles.inputField}
                   secureTextEntry={showPassword}
                 />
-                {touched && errors.password && (
+                {touched.password && errors.password && (
                   <Text style={styles.errorText}>*{errors.password}</Text>
                 )}
               </View>
@@ -135,6 +134,11 @@ const SignUp = ({ navigation }) => {
                 <Text style={styles.showPasswordText}>Show Password</Text>
               </View>
               <Bottom handleSubmit={handleSubmit} isValid={isValid} navigation={navigation} />
+              {errorMessage && (
+              <View style={styles.screenErrorContainer}>
+                <Text style={styles.screenErrorText}>{errorMessage}</Text>
+              </View>
+            )}
             </KeyboardAvoidingView>
           )} 
         </Formik>
@@ -153,10 +157,10 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: colors.primary,
     paddingHorizontal: 15,
-    paddingTop: 20,
+    paddingTop: 5,
   },
   formContainer: {
-    marginTop: Dimensions.get('window').height * 0.1,
+    marginTop: Dimensions.get('window').height * 0.05,
     gap: 15
   },
   formElementContainer: {
@@ -184,4 +188,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 400
   },
+  screenErrorContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: colors.failed,
+    borderRadius: 10
+  },
+  screenErrorText: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: '500'
+  }
 })

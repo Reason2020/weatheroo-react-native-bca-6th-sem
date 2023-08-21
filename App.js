@@ -11,6 +11,17 @@ import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const Stack = createNativeStackNavigator();
+const LoggedInStack = createNativeStackNavigator();
+
+
+const SignedInLayout = () => (
+  <LoggedInStack.Navigator screenOptions={{ headerShown: false }}>
+    <LoggedInStack.Screen name='Home' component={Home} />
+    <LoggedInStack.Screen name='UserProfile' component={UserProfile} />
+    <LoggedInStack.Screen name='WeeklyForecast' component={WeeklyForecast} />
+    <LoggedInStack.Screen name='SelectLocation' component={SelectLocation} />
+  </LoggedInStack.Navigator>
+)
 
 export default function App() {
   const [ user, setUser ] = useState();
@@ -24,22 +35,20 @@ export default function App() {
     })
   }, [])
 
+  
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='SignIn' screenOptions={{headerShown: false}}>
         { user ? (
-          <>
-            <Stack.Screen name='Home' component={Home} />
-            <Stack.Screen name='UserProfile' component={UserProfile} />
-            <Stack.Screen name='WeeklyForecast' component={WeeklyForecast} />
-            <Stack.Screen name='SelectLocation' component={SelectLocation} />
-          </>
+          <Stack.Screen name='SignedIn' component={SignedInLayout} />
         ) : (
           <>
             <Stack.Screen name='SignIn' component={SignIn} />
             <Stack.Screen name='SignUp' component={SignUp} />
           </>
-        )}
+        )
+        }
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,6 +1,6 @@
 import { Alert, Dimensions, KeyboardAvoidingView, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
-import { Formik } from 'formik'
+import { Formik, resetForm, formik } from 'formik'
 import * as Yup from 'yup'
 import BouncyCheckbox from "react-native-bouncy-checkbox"
 import { FIREBASE_AUTH } from '../../firebaseConfig'
@@ -8,6 +8,7 @@ import { colors } from '../../constants/colors'
 import Header from './components/Header'
 import Bottom from './components/Bottom'
 import { signInWithEmailAndPassword } from 'firebase/auth'
+import { useFocusEffect } from '@react-navigation/native'
 
 const ValidationSchema = Yup.object().shape({
   email: Yup.string()
@@ -20,6 +21,11 @@ const ValidationSchema = Yup.object().shape({
 
 const SignIn = ({ navigation }) => {
   const [ showPassword, setShowPassword ] = useState(true);
+  const [ errorMessage, setErrorMessage ] = useState();
+
+  useFocusEffect(() => {
+    // formik.resetForm();
+  })
 
   const auth = FIREBASE_AUTH;
 
@@ -37,6 +43,9 @@ const SignIn = ({ navigation }) => {
           try {
             const response = await signInWithEmailAndPassword(auth, values.email, values.password);
           } catch (error) {
+            if (error.message === "Firebase: Error (auth/user-not-found).") {
+              setErrorMessage("Invalid Email Address or Password!");
+            }
             console.log("Sign In Failed: ", error.message);
           }
         })()}
@@ -97,6 +106,11 @@ const SignIn = ({ navigation }) => {
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
             <Bottom handleSubmit={handleSubmit} isValid={isValid} navigation={navigation} />
+            {errorMessage && (
+              <View style={styles.screenErrorContainer}>
+                <Text style={styles.screenErrorText}>{errorMessage}</Text>
+              </View>
+            )}
           </KeyboardAvoidingView>  
         )}
       </Formik>
@@ -148,5 +162,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 400,
     color: colors.primary
+  },
+  screenErrorContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: colors.failed,
+    borderRadius: 10
+  },
+  screenErrorText: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: '500'
   }
 })
