@@ -6,6 +6,8 @@ import BouncyCheckbox from 'react-native-bouncy-checkbox'
 import Header from './components/Header'
 import { colors } from '../../constants/colors'
 import Bottom from './components/Bottom'
+import { FIREBASE_AUTH } from '../../firebaseConfig'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
 
 const ValidationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -23,7 +25,13 @@ const ValidationSchema = Yup.object().shape({
 })
 
 const SignUp = ({ navigation }) => {
+  // const [ firstName, setFirstName ] = useState('');
+  // const [ lastName, setLastName ] = useState('');
+  // const [ email, setEmail ] = useState('');
+  // const [ password, setPassword ] = useState('');
   const [ showPassword, setShowPassword ] = useState(true);
+
+  const auth = FIREBASE_AUTH;
 
   return (
     <SafeAreaView style={styles.mainContainer}>
@@ -40,7 +48,14 @@ const SignUp = ({ navigation }) => {
             password: ''
           }}
           validationSchema={ValidationSchema}  
-          onSubmit={() => Alert.alert('Registration Logic')}
+          onSubmit={(values) => (async () => {
+            try {
+              const response = await createUserWithEmailAndPassword(auth, values.email, values.password);
+              navigation.navigate('SignIn');
+            } catch (error) {
+              console.log("Sign in failed: ", error.message)
+            }
+          })()}
         >
           {({
             values,
@@ -55,6 +70,10 @@ const SignUp = ({ navigation }) => {
               <View style={styles.formElementContainer}>
                 <TextInput 
                   value={values.firstName}
+                  // onChangeText={() => {
+                  //   handleChange('firstName')
+                  //   setFirstName(values.firstName)
+                  // }}
                   onChangeText={handleChange('firstName')}
                   onBlur={handleBlur('firstName')}
                   placeholder='First Name'

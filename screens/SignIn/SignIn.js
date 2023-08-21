@@ -1,12 +1,13 @@
 import { Alert, Dimensions, KeyboardAvoidingView, SafeAreaView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
-import { Form, Formik } from 'formik'
+import { Formik } from 'formik'
 import * as Yup from 'yup'
 import BouncyCheckbox from "react-native-bouncy-checkbox"
+import { FIREBASE_AUTH } from '../../firebaseConfig'
 import { colors } from '../../constants/colors'
 import Header from './components/Header'
-import PrimaryButton from '../../components/PrimaryButton'
 import Bottom from './components/Bottom'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 
 const ValidationSchema = Yup.object().shape({
   email: Yup.string()
@@ -20,6 +21,8 @@ const ValidationSchema = Yup.object().shape({
 const SignIn = ({ navigation }) => {
   const [ showPassword, setShowPassword ] = useState(true);
 
+  const auth = FIREBASE_AUTH;
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
@@ -30,7 +33,13 @@ const SignIn = ({ navigation }) => {
           password: ''
         }}
         validationSchema={ValidationSchema}
-        onSubmit={() => Alert.alert('Login Successfull')}
+        onSubmit={(values) => (async () => {
+          try {
+            const response = await signInWithEmailAndPassword(auth, values.email, values.password);
+          } catch (error) {
+            console.log("Sign In Failed: ", error.message);
+          }
+        })()}
       >
         {({ 
             values, 
