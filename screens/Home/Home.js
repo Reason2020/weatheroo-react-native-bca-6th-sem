@@ -1,5 +1,4 @@
 import { StyleSheet, Text, View, ScrollView, StatusBar, Pressable, TouchableOpacity, ActivityIndicator } from 'react-native'
-import { Ionicons } from '@expo/vector-icons';
 import * as Location from "expo-location";
 import React, { useState, useEffect } from 'react'
 import Header from './components/Header';
@@ -7,16 +6,17 @@ import MainWeather from './components/MainWeather';
 import HourlyWeatherInfo from './components/HourlyWeatherInfo';
 import MoreInformation from './components/MoreInformation';
 import { fetchCurrentWeatherByCoordinates, fetchWeatherForecastByCoordinates } from '../../api/openWeatherMapApi';
+import { useLocation } from '../../LocationContext';
 
 
 const Home = ({ navigation }) => {
   const [ location, setLocation ] = useState(null);
   const [ errorMsg, setErrorMsg ] = useState(null);
-  const [ latitude, setLatitude ] = useState(null);
-  const [ longitude, setLongitude ] = useState(null);
   const [ currentWeatherData, setCurrentWeatherData ] = useState(null);
   const [ hourlyForecastData, setHourlyForecastData ] = useState(null);
   const [ loading, setLoading ] = useState(false);
+
+  const { latitude, longitude, updateLocation } = useLocation();
 
   useEffect(() => {
     (async () => {
@@ -29,16 +29,15 @@ const Home = ({ navigation }) => {
 
       let currentLocation = await Location.getCurrentPositionAsync({});
       setLocation(currentLocation);
-      setLatitude(currentLocation.coords.latitude);
-      setLongitude(currentLocation.coords.longitude);
+      // setLatitude(currentLocation.coords.latitude);
+      // setLongitude(currentLocation.coords.longitude);
+      updateLocation(currentLocation.coords.latitude, currentLocation.coords.longitude);
     })();
   }, [])
 
   useEffect(() => {
-    // getCurrentWeatherData();
-    // getHourlyWeatherForecast();
-    // setLoading(false);
     if (latitude && longitude) {
+      setLoading(true);
       (async () => {
         try {
           console.log("Loading: ", loading);
@@ -55,13 +54,6 @@ const Home = ({ navigation }) => {
     }
     
   }, [latitude, longitude])
-
-  // let text = ""
-  // if (latitude && longitude) {
-  //   text = `Latitude = ${latitude} and Longitude = ${longitude}`;
-  // } else if (errorMsg) {
-  //   text = errorMsg;
-  // }
 
   const getCurrentWeatherData = async () => {
     if (latitude && longitude) {
@@ -86,7 +78,6 @@ const Home = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
         <StatusBar />
-        {/* <Text>{text}</Text> */}
         <Header navigation={navigation} />
         <MainWeather weatherData={currentWeatherData} />
         <HourlyWeatherInfo navigation={navigation} weatherData={hourlyForecastData} />
@@ -99,7 +90,7 @@ export default Home
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#D2CED7',
+        backgroundColor: '#fff',
         paddingHorizontal: 5,
         paddingVertical: 3
     },

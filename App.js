@@ -9,6 +9,7 @@ import WeeklyForecast from './screens/WeeklyForecast/WeeklyForecast';
 import { FIREBASE_AUTH } from './firebaseConfig';
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
+import { LocationProvider } from './LocationContext';
 
 const Stack = createNativeStackNavigator();
 const LoggedInStack = createNativeStackNavigator();
@@ -38,18 +39,20 @@ export default function App() {
   
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='SignIn' screenOptions={{headerShown: false}}>
-        { user ? (
-          <Stack.Screen name='SignedIn' component={SignedInLayout} />
-        ) : (
-          <>
-            <Stack.Screen name='SignIn' component={SignIn} />
-            <Stack.Screen name='SignUp' component={SignUp} />
-          </>
-        )
-        }
-      </Stack.Navigator>
-    </NavigationContainer>
+    <LocationProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName='SignIn' screenOptions={{headerShown: false}}>
+          { user ? (
+            <Stack.Screen name='SignedIn' component={SignedInLayout} />
+          ) : (
+            <>
+              <Stack.Screen name='SignIn' component={SignIn} />
+              <Stack.Screen name='SignUp' component={SignUp} />
+            </>
+          )
+          }
+        </Stack.Navigator>
+      </NavigationContainer>
+    </LocationProvider>
   );
 }
