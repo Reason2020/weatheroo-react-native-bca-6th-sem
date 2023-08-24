@@ -7,16 +7,16 @@ import HourlyWeatherInfo from './components/HourlyWeatherInfo';
 import MoreInformation from './components/MoreInformation';
 import { fetchCurrentWeatherByCoordinates, fetchWeatherForecastByCoordinates } from '../../api/openWeatherMapApi';
 import { useLocation } from '../../LocationContext';
+import { fetchLocationFromGeocodes } from '../../api/geocodingApi';
 
 
 const Home = ({ navigation }) => {
-  const [ location, setLocation ] = useState(null);
   const [ errorMsg, setErrorMsg ] = useState(null);
   const [ currentWeatherData, setCurrentWeatherData ] = useState(null);
   const [ hourlyForecastData, setHourlyForecastData ] = useState(null);
   const [ loading, setLoading ] = useState(false);
 
-  const { latitude, longitude, updateLocation } = useLocation();
+  const { latitude, longitude, locationTitle, updateLocation } = useLocation();
 
   useEffect(() => {
     (async () => {
@@ -28,10 +28,12 @@ const Home = ({ navigation }) => {
       }
 
       let currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
-      // setLatitude(currentLocation.coords.latitude);
-      // setLongitude(currentLocation.coords.longitude);
-      updateLocation(currentLocation.coords.latitude, currentLocation.coords.longitude);
+      console.log(currentLocation);
+      const currentLocationTitleResponse = await fetchLocationFromGeocodes(currentLocation.coords.latitude, currentLocation.coords.longitude);
+      const currentLocationTitle = currentLocationTitleResponse?.sublocality;
+      console.log("Location Title from Home: ", currentLocationTitle);
+      updateLocation(currentLocation.coords.latitude, currentLocation.coords.longitude, currentLocationTitle);
+      setLoading(false);
     })();
   }, [])
 
@@ -40,34 +42,27 @@ const Home = ({ navigation }) => {
       setLoading(true);
       (async () => {
         try {
-          console.log("Loading: ", loading);
-          await Promise.all([
-            getCurrentWeatherData(),
-            getHourlyWeatherForecast()
+          console.log("Current Latitude and Longitude: ", latitude, longitude);
+          const [ currentData, hourlyData ] = await Promise.all([
+            fetchCurrentWeatherByCoordinates(latitude, longitude),
+            fetchWeatherForecastByCoordinates(latitude, longitude)
           ]);
-          setLoading(false);
+          console.log("Current Latitude and Longitude: ", latitude, longitude);
+          console.log("Current Weather Data: ", currentData);
+          console.log("Hourly Data: ", hourlyData.list);
+
+          setCurrentWeatherData(currentData);
+          setHourlyForecastData(hourlyData.list);
         } catch (error) {
           console.log("Error fetching data: ", error);
           setLoading(false);
+        } finally {
+          setLoading(false)
         }
       })();      
     }
     
-  }, [latitude, longitude])
-
-  const getCurrentWeatherData = async () => {
-    if (latitude && longitude) {
-      const data = await fetchCurrentWeatherByCoordinates(latitude, longitude);
-      if (data) setCurrentWeatherData(data);
-    }
-  }
-
-  const getHourlyWeatherForecast = async () => {
-    if (latitude && longitude) {
-      const data = await fetchWeatherForecastByCoordinates(latitude, longitude);
-      if (data) setHourlyForecastData(data.list);
-    }
-  }
+  }, [latitude, longitude, locationTitle]);
 
   if (loading) return (
     <View style={styles.activityIndicatorContainer}>
@@ -78,7 +73,7 @@ const Home = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
         <StatusBar />
-        <Header navigation={navigation} />
+        <Header navigation={navigation} locationTitle={locationTitle} />
         <MainWeather weatherData={currentWeatherData} />
         <HourlyWeatherInfo navigation={navigation} weatherData={hourlyForecastData} />
         <MoreInformation weatherData={currentWeatherData} />

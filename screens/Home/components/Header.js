@@ -2,8 +2,12 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { Ionicons } from '@expo/vector-icons';
 import Profile from './Profile';
+// import { useLocation } from '../../../LocationContext';
 
-const Header = ({ navigation }) => {
+const Header = ({ navigation, locationTitle }) => {
+
+  console.log("Location Title: ", locationTitle);
+
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => console.log("Refresh the page")}>
@@ -11,7 +15,7 @@ const Header = ({ navigation }) => {
       </TouchableOpacity>
       <TouchableOpacity style={styles.locationBtn} onPress={() => navigation.navigate("SelectLocation")}>
         <Ionicons name="location-outline" size={24} color="black" />
-        <Text style={styles.locationText}>Lubhu</Text>
+        <Text style={styles.locationText}>{locationTitle}</Text>
         <Ionicons name="chevron-down" size={24} color="black" />
       </TouchableOpacity>
       <Profile navigation={navigation} />

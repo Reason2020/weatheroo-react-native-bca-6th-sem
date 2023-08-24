@@ -4,16 +4,13 @@ import axios from "axios";
 const apiBaseURL = "https://trueway-geocoding.p.rapidapi.com"
 
 const forwardGeocodingEndpoint = `${apiBaseURL}/Geocode`;
-const reverseGeocodingEndpoint = `${apiBaseURL}/reverse`;
+const reverseGeocodingEndpoint = `${apiBaseURL}/ReverseGeocode`;
 
-const apiCall = async (endpoint, city) => {
+const apiCall = async (endpoint, params) => {
     const options = {
         method: 'GET',
         url: endpoint,
-        params: {
-            address: city,
-            language: 'en'
-        },
+        params: params,
         headers: {
             'X-RapidAPI-Key': geocodingApiKey,
             'X-RapidAPI-Host': 'trueway-geocoding.p.rapidapi.com'
@@ -30,5 +27,10 @@ const apiCall = async (endpoint, city) => {
 }
 
 export const fetchGeocodesFromLocation = (cityName) => {
-    return apiCall(forwardGeocodingEndpoint, cityName);
+    return apiCall(forwardGeocodingEndpoint, {address: cityName, language: 'en'});
+}
+
+export const fetchLocationFromGeocodes = (latitude, longitude) => {
+    console.log("Latitude and longitude: ", latitude, longitude);
+    return apiCall(reverseGeocodingEndpoint, {location: `${latitude}, ${longitude}`, language: 'en'});
 }

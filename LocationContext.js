@@ -9,15 +9,18 @@ export function useLocation() {
 export function LocationProvider({ children }) {
     const [ latitude, setLatitude ] = useState(0);
     const [ longitude, setLongitude ] = useState(0);
+    const [ locationTitle, setLocationTitle ] = useState("");
 
-    const updateLocation = (newLatitude, newLongitude) => {
+    const updateLocation = (newLatitude, newLongitude, newLocationTitle) => {
         setLatitude(newLatitude);
         setLongitude(newLongitude);
+        setLocationTitle(newLocationTitle);
     }
 
     const value = {
         latitude,
         longitude,
+        locationTitle,
         updateLocation,
     }
 

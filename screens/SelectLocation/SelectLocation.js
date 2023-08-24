@@ -1,22 +1,22 @@
 import { StyleSheet, Text, View, Button, TouchableOpacity, ScrollView, StatusBar, TextInput } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import { addDoc, collection, getDocs } from 'firebase/firestore'
+import { addDoc, collection, getDocs, deleteDoc, doc } from 'firebase/firestore'
 import { FIREBASE_DB } from '../../firebaseConfig'
 import Iconify from '../../components/Iconify'
 import { colors } from '../../constants/colors'
 import Header from './components/Header'
 import { useLocation } from '../../LocationContext'
 import { fetchGeocodesFromLocation } from '../../api/geocodingApi'
+import { FIREBASE_AUTH } from '../../firebaseConfig'
 
-const SelectLocation = ({ navigation, route }) => {
+const SelectLocation = ({ navigation }) => {
   const [ usersFavouriteLocations, setUsersFavouriteLocations ] = useState([]);
   const [ searchText, setSearchText ] = useState("");
   const [ showSearchBar, setShowSearchBar ] = useState(false);
 
   const getGeocodesFromCityName = async () => {
     try {
-      const data = await fetchGeocodesFromLocation("Kathmandu");
-      console.log("Function Definition part: ", data?.location);
+      const data = await fetchGeocodesFromLocation(searchText);
       if (data) return data?.location;
     } catch (err) {
       console.log("Error from Select Location: ", err);
@@ -38,7 +38,7 @@ const SelectLocation = ({ navigation, route }) => {
         ...doc.data(), 
         id: doc.id
       }))
-      setUsersFavouriteLocations(filteredData);
+      setUsersFavouriteLocations(filteredData.filter((doc) => FIREBASE_AUTH.currentUser.uid === doc.userId));
     } catch (err) {
       console.log("Error while fetching locations: ", err);
     }
@@ -48,18 +48,31 @@ const SelectLocation = ({ navigation, route }) => {
     getLocationList();
   }, []);
 
-  //need to add user id later
   const onAddFavouriteCity = async () => {
     try {
       const locationData = await getGeocodesFromCityName();
-      console.log("Location Data: ", locationData);
+      console.log("Latitude and longitude of newly added city: ", locationData.lat, locationData.lng);
       await addDoc(locationsRef, {
         locationTitle: searchText,
         latitude: locationData.lat,
         longitude: locationData.lng,
+        userId: FIREBASE_AUTH.currentUser.uid
       })
+      getLocationList();
+      setSearchText("");
     } catch (err) {
       console.log("Error while adding city: ", err);
+    }
+  }
+
+  const deleteLocation = async (id) => {
+    try {
+      const locationDoc = doc(FIREBASE_DB, "locations", id);
+      await deleteDoc(locationDoc);
+    } catch (err) {
+      console.log("Error while deleting location: ", err);
+    } finally {
+      getLocationList();
     }
   }
 
@@ -98,17 +111,18 @@ const SelectLocation = ({ navigation, route }) => {
       {usersFavouriteLocations ? (
         <View style={styles.listContainer}>
           <ScrollView>
-            {usersFavouriteLocations.map((favouriteLocation, index) => (
+            {usersFavouriteLocations.map((favouriteLocation) => (
               <TouchableOpacity onPress={() => {
-                updateLocation(favouriteLocation.latitude, favouriteLocation.longitude)
+                console.log("Latitude and longitude of favourite location: ", favouriteLocation.latitude, favouriteLocation.longitude);
+                updateLocation(favouriteLocation.latitude, favouriteLocation.longitude, favouriteLocation.locationTitle)
                 navigation.navigate("Home")
               }} 
               style={styles.locationContainer}
-              key={index}
+              key={favouriteLocation.id}
               >
                 <Iconify iconsFrom="FontAwesome" iconName="location-arrow" color="#fff" />
                 <Text style={styles.locationTitle}>{favouriteLocation.locationTitle}</Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => deleteLocation(favouriteLocation.id)} >
                   <Iconify iconsFrom="Entypo" iconName="cross" color="#fff" />
                 </TouchableOpacity>
               </TouchableOpacity>
