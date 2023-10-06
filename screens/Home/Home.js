@@ -14,6 +14,7 @@ const Home = ({ navigation }) => {
   const [ errorMsg, setErrorMsg ] = useState(null);
   const [ currentWeatherData, setCurrentWeatherData ] = useState(null);
   const [ hourlyForecastData, setHourlyForecastData ] = useState(null);
+  const [ weeklyForecastData, setWeeklyForecastData ] = useState(null);
   const [ loading, setLoading ] = useState(false);
 
   const { latitude, longitude, locationTitle, updateLocation } = useLocation();
@@ -43,6 +44,7 @@ const Home = ({ navigation }) => {
       (async () => {
         try {
           console.log("Current Latitude and Longitude: ", latitude, longitude);
+          const weeklyData = [];
           const [ currentData, hourlyData ] = await Promise.all([
             fetchCurrentWeatherByCoordinates(latitude, longitude),
             fetchWeatherForecastByCoordinates(latitude, longitude)
@@ -50,9 +52,16 @@ const Home = ({ navigation }) => {
           console.log("Current Latitude and Longitude: ", latitude, longitude);
           console.log("Current Weather Data: ", currentData);
           console.log("Hourly Data: ", hourlyData.list);
+          hourlyData.list.forEach(data => {
+            if (data.dt_txt.includes("06:00:00")) {
+              weeklyData.push(data);
+            }
+          });
+          console.log("Weekly Data: ", weeklyData);
 
           setCurrentWeatherData(currentData);
           setHourlyForecastData(hourlyData.list);
+          setWeeklyForecastData(weeklyData);
         } catch (error) {
           console.log("Error fetching data: ", error);
           setLoading(false);
@@ -61,7 +70,7 @@ const Home = ({ navigation }) => {
         }
       })();      
     }
-    
+    console.log("Weekly Forecast Data at Home: ", weeklyForecastData);
   }, [latitude, longitude, locationTitle]);
 
   if (loading) return (
@@ -75,7 +84,7 @@ const Home = ({ navigation }) => {
         <StatusBar />
         <Header navigation={navigation} locationTitle={locationTitle} />
         <MainWeather weatherData={currentWeatherData} />
-        <HourlyWeatherInfo navigation={navigation} weatherData={hourlyForecastData} />
+        <HourlyWeatherInfo navigation={navigation} weatherData={hourlyForecastData} currentData={currentWeatherData} weeklyData={weeklyForecastData} />
         <MoreInformation weatherData={currentWeatherData} />
     </ScrollView>
   )

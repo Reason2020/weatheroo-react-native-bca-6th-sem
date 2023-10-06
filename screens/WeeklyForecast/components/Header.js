@@ -9,7 +9,7 @@ const Header = ({ navigation }) => {
       <TouchableOpacity onPress={() => navigation.pop()}>
         <Iconify iconName="arrow-left" iconsFrom="Feather" color={colors.primary} />
       </TouchableOpacity>
-      <Text style={styles.headerTitle}>Favourite Locations</Text>
+      <Text style={styles.headerTitle}>Weekly Forecast</Text>
     </View>
   )
 }
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         gap: 25,
-        marginBottom: 25
+        marginBottom: 5
     },
     headerTitle: {
         fontSize: 22,

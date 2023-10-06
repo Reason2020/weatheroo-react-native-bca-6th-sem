@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Ionicons } from '@expo/vector-icons';
 import HourlyWeatherCard from './HourlyWeatherCard'
 
-const HourlyWeatherInfo = ({ navigation, weatherData }) => {
+const HourlyWeatherInfo = ({ navigation, weatherData, currentData, weeklyData }) => {
     const [ currentTime, setCurrentTime ] = useState(Math.floor(Date.now() / 1000));
     const [ filteredWeatherData, setFilteredWeatherData ] = useState(null);
 
@@ -35,12 +35,14 @@ const HourlyWeatherInfo = ({ navigation, weatherData }) => {
         { id: 10, temperature: 23, time: 10 }
     ]
 
+    console.log("Weekly Forecast Data at HourlyWeatherInfo: ", weeklyData);
+
   if (filteredWeatherData) {
     return (
         <View style={styles.container}>
             <View style={styles.titleContainer}>
                 <Text style={styles.titleText}>Hourly Weather</Text>
-                <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('WeeklyForecast')}>
+                <TouchableOpacity style={styles.secondaryBtn} onPress={() => navigation.navigate('WeeklyForecast', { weatherData: currentData, weeklyData: weeklyData })}>
                     <Text style={styles.btnText}>Weekly Weather</Text>
                     <Ionicons name="chevron-forward" size={18} color="black" />
                 </TouchableOpacity>
