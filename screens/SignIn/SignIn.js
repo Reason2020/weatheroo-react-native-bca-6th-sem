@@ -23,10 +23,6 @@ const SignIn = ({ navigation }) => {
   const [ showPassword, setShowPassword ] = useState(true);
   const [ errorMessage, setErrorMessage ] = useState();
 
-  useFocusEffect(() => {
-    // formik.resetForm();
-  })
-
   const auth = FIREBASE_AUTH;
 
   return (
@@ -101,7 +97,7 @@ const SignIn = ({ navigation }) => {
             <TouchableOpacity 
               style={styles.forgotPasswordContainer} 
               onPress={
-                () => alert('Sorry that you forgot password...')
+                () => navigation.navigate('ForgotPassword')
               }>
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>

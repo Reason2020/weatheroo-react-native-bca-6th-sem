@@ -10,6 +10,7 @@ import { FIREBASE_AUTH } from './firebaseConfig';
 import { useEffect, useState } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { LocationProvider } from './LocationContext';
+import ForgotPassword from './screens/ForgotPassword/ForgotPassword';
 
 const Stack = createNativeStackNavigator();
 const LoggedInStack = createNativeStackNavigator();
@@ -48,6 +49,7 @@ export default function App() {
             <>
               <Stack.Screen name='SignIn' component={SignIn} />
               <Stack.Screen name='SignUp' component={SignUp} />
+              <Stack.Screen name='ForgotPassword' component={ForgotPassword} />
             </>
           )
           }
