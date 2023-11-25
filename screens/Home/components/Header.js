@@ -4,9 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Profile from './Profile';
 // import { useLocation } from '../../../LocationContext';
 
-const Header = ({ navigation, locationTitle }) => {
-
-  console.log("Location Title: ", locationTitle);
+const Header = ({ navigation, locationTitle, shortHandName }) => {
 
   return (
     <View style={styles.container}>
@@ -18,7 +16,7 @@ const Header = ({ navigation, locationTitle }) => {
         <Text style={styles.locationText}>{locationTitle}</Text>
         <Ionicons name="chevron-down" size={24} color="black" />
       </TouchableOpacity>
-      <Profile navigation={navigation} />
+      <Profile navigation={navigation} shortHandName={shortHandName} />
     </View>
   )
 }

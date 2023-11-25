@@ -8,6 +8,7 @@ import MoreInformation from './components/MoreInformation';
 import { fetchCurrentWeatherByCoordinates, fetchWeatherForecastByCoordinates } from '../../api/openWeatherMapApi';
 import { useLocation } from '../../LocationContext';
 import { fetchLocationFromGeocodes } from '../../api/geocodingApi';
+import { FIREBASE_AUTH } from '../../firebaseConfig';
 
 
 const Home = ({ navigation }) => {
@@ -15,6 +16,7 @@ const Home = ({ navigation }) => {
   const [ currentWeatherData, setCurrentWeatherData ] = useState(null);
   const [ hourlyForecastData, setHourlyForecastData ] = useState(null);
   const [ weeklyForecastData, setWeeklyForecastData ] = useState(null);
+  const [ shortHandName, setShortHandName ] = useState("");
   const [ loading, setLoading ] = useState(false);
 
   const { latitude, longitude, locationTitle, updateLocation } = useLocation();
@@ -34,9 +36,15 @@ const Home = ({ navigation }) => {
       const currentLocationTitle = currentLocationTitleResponse?.sublocality;
       console.log("Location Title from Home: ", currentLocationTitle);
       updateLocation(currentLocation.coords.latitude, currentLocation.coords.longitude, currentLocationTitle);
+
+      // const auth = FIREBASE_AUTH;
+      // const user = auth.currentUser;
+      // const { displayName } = user;
+      // const nameArr = displayName.split(' ');
       setLoading(false);
     })();
   }, [])
+  console.log(shortHandName);
 
   useEffect(() => {
     if (latitude && longitude) {
@@ -62,6 +70,7 @@ const Home = ({ navigation }) => {
           setCurrentWeatherData(currentData);
           setHourlyForecastData(hourlyData.list);
           setWeeklyForecastData(weeklyData);
+          setShortHandName(FIREBASE_AUTH.currentUser.displayName.split(' ')[0][0] + FIREBASE_AUTH.currentUser.displayName.split(' ')[1][0])
         } catch (error) {
           console.log("Error fetching data: ", error);
           setLoading(false);
@@ -82,7 +91,7 @@ const Home = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
         <StatusBar />
-        <Header navigation={navigation} locationTitle={locationTitle} />
+        <Header navigation={navigation} locationTitle={locationTitle} shortHandName={shortHandName} />
         <MainWeather weatherData={currentWeatherData} />
         <HourlyWeatherInfo navigation={navigation} weatherData={hourlyForecastData} currentData={currentWeatherData} weeklyData={weeklyForecastData} />
         <MoreInformation weatherData={currentWeatherData} />

@@ -21,7 +21,7 @@ const ValidationSchema = Yup.object().shape({
 
 const SignIn = ({ navigation }) => {
   const [ showPassword, setShowPassword ] = useState(true);
-  const [ errorMessage, setErrorMessage ] = useState();
+  const [ errorMessage, setErrorMessage ] = useState("");
 
   const auth = FIREBASE_AUTH;
 
@@ -39,7 +39,7 @@ const SignIn = ({ navigation }) => {
           try {
             const response = await signInWithEmailAndPassword(auth, values.email, values.password);
           } catch (error) {
-            if (error.message === "Firebase: Error (auth/user-not-found).") {
+            if (error.message === "Firebase: Error (auth/user-not-found)." || error.message === "Firebase: Error (auth/wrong-password).") {
               setErrorMessage("Invalid Email Address or Password!");
             }
             console.log("Sign In Failed: ", error.message);
@@ -101,7 +101,7 @@ const SignIn = ({ navigation }) => {
               }>
                 <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
-            <Bottom handleSubmit={handleSubmit} isValid={isValid} navigation={navigation} />
+            <Bottom handleSubmit={handleSubmit} isValid={isValid} navigation={navigation} setErrorMessage={setErrorMessage} />
             {errorMessage && (
               <View style={styles.screenErrorContainer}>
                 <Text style={styles.screenErrorText}>{errorMessage}</Text>
