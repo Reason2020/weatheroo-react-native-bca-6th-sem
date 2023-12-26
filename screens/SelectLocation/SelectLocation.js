@@ -13,6 +13,7 @@ const SelectLocation = ({ navigation }) => {
   const [ usersFavouriteLocations, setUsersFavouriteLocations ] = useState([]);
   const [ searchText, setSearchText ] = useState("");
   const [ showSearchBar, setShowSearchBar ] = useState(false);
+  const [ errorMessage, setErrorMessage ] = useState("");
 
   const getGeocodesFromCityName = async () => {
     try {
@@ -50,6 +51,7 @@ const SelectLocation = ({ navigation }) => {
 
   const onAddFavouriteCity = async () => {
     try {
+      setErrorMessage("");
       const locationData = await getGeocodesFromCityName();
       console.log("Latitude and longitude of newly added city: ", locationData.lat, locationData.lng);
       await addDoc(locationsRef, {
@@ -62,6 +64,7 @@ const SelectLocation = ({ navigation }) => {
       setSearchText("");
     } catch (err) {
       console.log("Error while adding city: ", err);
+      setErrorMessage("Error while adding city");
     }
   }
 
@@ -127,6 +130,11 @@ const SelectLocation = ({ navigation }) => {
                 </TouchableOpacity>
               </TouchableOpacity>
             ))}
+            {errorMessage && (
+              <View style={styles.screenErrorContainer}>
+                <Text style={styles.screenErrorText}>{errorMessage}</Text>
+              </View>
+            )}
           </ScrollView>
         </View>
       ) : null}
@@ -193,5 +201,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     right: 30
+  },
+  screenErrorContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: colors.failed,
+    borderRadius: 10
+  },
+  screenErrorText: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: '500'
   }
 })
